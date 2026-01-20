@@ -1,6 +1,5 @@
 package com.example.ordersapi.steps;
 
-import com.example.ordersapi.domain.model.Order;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -9,6 +8,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderSteps {
@@ -16,7 +18,7 @@ public class OrderSteps {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private Order order;
+    private Map<String, Object> orderRequest;
     private Long orderId;
     private ResponseEntity<?> response;
 
@@ -24,30 +26,37 @@ public class OrderSteps {
 
     @Given("an order with product {string} and quantity {int}")
     public void givenOrder(String product, int quantity) {
-        this.order = new Order(product, quantity);
+        orderRequest = new HashMap<>();
+        orderRequest.put("product", product);
+        orderRequest.put("quantity", quantity);
     }
 
     @Given("an existing order with product {string} and quantity {int}")
     public void givenExistingOrder(String product, int quantity) {
-        Order existingOrder = new Order(product, quantity);
-        ResponseEntity<Order> createResponse =
-                restTemplate.postForEntity("/orders", existingOrder, Order.class);
+        Map<String, Object> request = new HashMap<>();
+        request.put("product", product);
+        request.put("quantity", quantity);
 
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ResponseEntity<Map> createResponse =
+                restTemplate.postForEntity("/orders", request, Map.class);
+
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
-        this.orderId = createResponse.getBody().getId();
+
+        this.orderId = ((Number) createResponse.getBody().get("id")).longValue();
     }
 
     // ---------- WHEN ----------
 
     @When("the order is saved")
     public void whenOrderIsSaved() {
-        ResponseEntity<Order> createResponse =
-                restTemplate.postForEntity("/orders", order, Order.class);
+        ResponseEntity<Map> createResponse =
+                restTemplate.postForEntity("/orders", orderRequest, Map.class);
 
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
-        this.orderId = createResponse.getBody().getId();
+
+        this.orderId = ((Number) createResponse.getBody().get("id")).longValue();
     }
 
     @When("the order is deleted")
@@ -68,7 +77,7 @@ public class OrderSteps {
 
     @When("I request all orders")
     public void whenRequestAllOrders() {
-        response = restTemplate.getForEntity("/orders", Order[].class);
+        response = restTemplate.getForEntity("/orders", Object[].class);
     }
 
     @When("I create an order with invalid payload")
@@ -80,12 +89,13 @@ public class OrderSteps {
 
     @Then("the order is persisted successfully")
     public void thenOrderPersistedSuccessfully() {
-        ResponseEntity<Order> getResponse =
-                restTemplate.getForEntity("/orders/" + orderId, Order.class);
+        ResponseEntity<Map> getResponse =
+                restTemplate.getForEntity("/orders/" + orderId, Map.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody()).isNotNull();
-        assertThat(getResponse.getBody().getId()).isEqualTo(orderId);
+        assertThat(((Number) getResponse.getBody().get("id")).longValue())
+                .isEqualTo(orderId);
     }
 
     @Then("the order no longer exists")
