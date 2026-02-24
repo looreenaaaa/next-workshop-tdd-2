@@ -9,7 +9,7 @@ Feature: Manage players
     Then the player is persisted successfully
 
   Scenario: Get an existing player by ID
-    Given an existing player with name "Vinicius", team "Real Madrid", number 7 and position "Forward"
+    Given an existing player with name "Vinicius", team "Real Madrid", number 7 and position "Striker"
     When I request the player by ID
     Then I should receive the player "Vinicius"
     And the response status should be 200
@@ -21,7 +21,7 @@ Feature: Manage players
     And the response status should be 200
 
   Scenario: Delete an existing player
-    Given an existing player with name "Gavi", team "Barcelona", number 6 and position "Midfielder"
+    Given an existing player with name "Antoine Griezman", team "Atletico de Madrid", number 7 and position "Striker"
     When the player is deleted
     Then the player no longer exists
 

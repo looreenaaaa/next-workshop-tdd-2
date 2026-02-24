@@ -85,21 +85,9 @@ public class PlayerSteps {
         restTemplate.delete("/players/" + playerId);
     }
 
-
-    @When("I delete an order with id {int}")
-    public void whenDeleteOrderById(Integer id) {
-        restTemplate.delete("/orders/{id}", id);
-        response = restTemplate.getForEntity("/orders/{id}", String.class, id);
-    }
-
-    @When("I request all orders")
-    public void whenRequestAllOrders() {
-        response = restTemplate.getForEntity("/orders", Object[].class);
-    }
-
-    @When("I create an order with invalid payload")
-    public void whenCreateInvalidOrder() {
-        response = restTemplate.postForEntity("/orders", "invalid-json", String.class);
+    @When("I request a player with id {int}")
+    public void whenRequestPlayerById(Integer id) {
+        response = restTemplate.getForEntity("/players/{id}", String.class, id);
     }
 
     // ---------- THEN ----------
