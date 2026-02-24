@@ -11,17 +11,14 @@ class PlayerPersistenceMapperTest {
 
     @Test
     void toEntity_should_map_domain_to_entity() {
-        // Arrange (Preparar)
         Player domain = new Player();
         domain.setName("Lamine Yamal");
         domain.setTeam("Barcelona");
         domain.setNumber(19);
         domain.setPosition("Forward");
 
-        // Act (Actuar)
         PlayerEntity entity = mapper.toEntity(domain);
 
-        // Assert (Comprobar)
         assertThat(entity).isNotNull();
         assertThat(entity.getName()).isEqualTo("Lamine Yamal");
         assertThat(entity.getTeam()).isEqualTo("Barcelona");
@@ -29,20 +26,24 @@ class PlayerPersistenceMapperTest {
         assertThat(entity.getPosition()).isEqualTo("Forward");
     }
 
-//    @Test
-//    void toDomain_should_map_entity_to_domain() {
-//        PlayerEntity entity = new PlayerEntity();
-//        entity.setId(1L);
-//        entity.setProduct("Pen");
-//        entity.setQuantity(5);
-//
-//        Player domain = mapper.toDomain(entity);
-//
-//        assertThat(domain).isNotNull();
-//        assertThat(domain.getId()).isEqualTo(1L);
-//        assertThat(domain.getProduct()).isEqualTo("Pen");
-//        assertThat(domain.getQuantity()).isEqualTo(5);
-//    }
+    @Test
+    void toDomain_should_map_entity_to_domain() {
+        PlayerEntity entity = new PlayerEntity();
+        entity.setId(2L);
+        entity.setName("Camavinga");
+        entity.setTeam("Real Madrid");
+        entity.setNumber(12);
+        entity.setPosition("Midfielder");
+
+        Player domain = mapper.toDomain(entity);
+
+        assertThat(domain).isNotNull();
+        assertThat(domain.getId()).isEqualTo(2L);
+        assertThat(domain.getName()).isEqualTo("Camavinga");
+        assertThat(domain.getTeam()).isEqualTo("Real Madrid");
+        assertThat(domain.getNumber()).isEqualTo(12);
+        assertThat(domain.getPosition()).isEqualTo("Midfielder");
+    }
 
     @Test
     void toEntity_should_return_null_when_domain_is_null() {

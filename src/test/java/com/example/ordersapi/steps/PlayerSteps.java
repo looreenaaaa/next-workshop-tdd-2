@@ -33,17 +33,15 @@ public class PlayerSteps {
         playerRequest.put("position", position);
     }
 
-    @Given("an existing order with product {string} and quantity {int}")
-    public void givenExistingOrder(String product, int quantity) {
-        Map<String, Object> request = new HashMap<>();
-        request.put("product", product);
-        request.put("quantity", quantity);
+    @Given("an existing player with name {string}, team {string}, number {int} and position {string}")
+    public void anExistingPlayerWithNameTeamNumberAndPosition(String name, String team, Integer number, String position) {
+        playerRequest = new HashMap<>();
+        playerRequest.put("name", name);
+        playerRequest.put("team", team);
+        playerRequest.put("number", number);
+        playerRequest.put("position", position);
 
-        ResponseEntity<Map> createResponse =
-                restTemplate.postForEntity("/orders", request, Map.class);
-
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(createResponse.getBody()).isNotNull();
+        ResponseEntity<Map> createResponse = restTemplate.postForEntity("/players", playerRequest, Map.class);
 
         this.playerId = ((Number) createResponse.getBody().get("id")).longValue();
     }
@@ -59,6 +57,11 @@ public class PlayerSteps {
         assertThat(createResponse.getBody()).isNotNull();
 
         this.playerId = ((Number) createResponse.getBody().get("id")).longValue();
+    }
+
+    @When("I request the player by ID")
+    public void requestPlayerById() {
+        this.response = restTemplate.getForEntity("/players/" + this.playerId, Map.class);
     }
 
     @When("the order is deleted")
@@ -98,6 +101,13 @@ public class PlayerSteps {
         assertThat(getResponse.getBody()).isNotNull();
         assertThat(((Number) getResponse.getBody().get("id")).longValue())
                 .isEqualTo(playerId);
+    }
+
+    @Then("I should receive the player {string}")
+    public void shouldReceivePlayer(String expectedName) {
+        Map<String, Object> body = (Map<String, Object>) this.response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.get("name")).isEqualTo(expectedName);
     }
 
     @Then("the order no longer exists")
