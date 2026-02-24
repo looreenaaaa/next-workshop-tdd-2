@@ -13,4 +13,6 @@ public interface PlayerUseCase {
     Player getById(Long id);
 
     void delete(Long id);
+
+    Player update(Long id, Player player);
 }

@@ -5,6 +5,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -64,6 +65,21 @@ public class PlayerSteps {
         this.response = restTemplate.getForEntity("/players/" + this.playerId, Map.class);
     }
 
+    @When("I update the position to {string}")
+    public void updateThePositionTo(String newPosition) {
+        this.playerRequest.put("position", newPosition);
+
+        org.springframework.http.HttpEntity<java.util.Map<String, Object>> requestEntity =
+                new org.springframework.http.HttpEntity<>(this.playerRequest);
+
+        this.response = restTemplate.exchange(
+                "/players/" + this.playerId,
+                HttpMethod.PUT,
+                requestEntity,
+                java.util.Map.class
+        );
+    }
+
     @When("the order is deleted")
     public void whenOrderIsDeleted() {
         restTemplate.delete("/orders/" + playerId);
@@ -108,6 +124,13 @@ public class PlayerSteps {
         Map<String, Object> body = (Map<String, Object>) this.response.getBody();
         assertThat(body).isNotNull();
         assertThat(body.get("name")).isEqualTo(expectedName);
+    }
+
+    @Then("the player should now have the position {string}")
+    public void thePlayerShouldNowHaveThePosition(String expectedPosition) {
+        java.util.Map<String, Object> body = (Map<String, Object>) this.response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.get("position")).isEqualTo(expectedPosition);
     }
 
     @Then("the order no longer exists")

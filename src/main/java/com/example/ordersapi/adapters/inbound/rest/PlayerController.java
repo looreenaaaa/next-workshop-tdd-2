@@ -47,4 +47,11 @@ public class PlayerController {
     public void delete(@PathVariable Long id) {
         useCase.delete(id);
     }
+
+    @PutMapping("/{id}")
+    public PlayerResponseDto update(@PathVariable Long id, @RequestBody PlayerRequestDto request) {
+        Player playerToUpdate = mapper.toDomain(request);
+        Player updatedPlayer = useCase.update(id, playerToUpdate);
+        return mapper.toResponse(updatedPlayer);
+    }
 }

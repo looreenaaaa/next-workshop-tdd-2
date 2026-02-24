@@ -39,4 +39,17 @@ public class PlayerService implements PlayerUseCase {
                 .orElseThrow(() -> new PlayerNotFoundException(id));
         repository.delete(player);
     }
+
+    @Override
+    public Player update(Long id, Player player) {
+        Player existingPlayer = repository.findById(id)
+                .orElseThrow(() -> new PlayerNotFoundException(id));
+
+        existingPlayer.setName(player.getName());
+        existingPlayer.setTeam(player.getTeam());
+        existingPlayer.setNumber(player.getNumber());
+        existingPlayer.setPosition(player.getPosition());
+
+        return repository.save(existingPlayer);
+    }
 }
