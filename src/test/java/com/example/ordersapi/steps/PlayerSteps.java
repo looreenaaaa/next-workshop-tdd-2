@@ -80,15 +80,11 @@ public class PlayerSteps {
         );
     }
 
-    @When("the order is deleted")
-    public void whenOrderIsDeleted() {
-        restTemplate.delete("/orders/" + playerId);
+    @When("the player is deleted")
+    public void whenPlayerIsDeleted() {
+        restTemplate.delete("/players/" + playerId);
     }
 
-    @When("I request an order with id {int}")
-    public void whenRequestOrderById(Integer id) {
-        response = restTemplate.getForEntity("/orders/{id}", String.class, id);
-    }
 
     @When("I delete an order with id {int}")
     public void whenDeleteOrderById(Integer id) {
@@ -133,10 +129,10 @@ public class PlayerSteps {
         assertThat(body.get("position")).isEqualTo(expectedPosition);
     }
 
-    @Then("the order no longer exists")
-    public void thenOrderNoLongerExists() {
+    @Then("the player no longer exists")
+    public void thenPlayerNoLongerExists() {
         ResponseEntity<String> getResponse =
-                restTemplate.getForEntity("/orders/" + playerId, String.class);
+                restTemplate.getForEntity("/players/" + playerId, String.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
