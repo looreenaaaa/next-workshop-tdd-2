@@ -13,22 +13,24 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrderSteps {
+public class PlayerSteps {
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private Map<String, Object> orderRequest;
-    private Long orderId;
+    private Map<String, Object> playerRequest;
+    private Long playerId;
     private ResponseEntity<?> response;
 
     // ---------- GIVEN ----------
 
-    @Given("an order with product {string} and quantity {int}")
-    public void givenOrder(String product, int quantity) {
-        orderRequest = new HashMap<>();
-        orderRequest.put("product", product);
-        orderRequest.put("quantity", quantity);
+    @Given("a player with name {string}, team {string}, number {int} and position {string}")
+    public void playerWithNameTeamNumberAndPosition(String name, String team, Integer number, String position) {
+        playerRequest = new HashMap<>();
+        playerRequest.put("name", name);
+        playerRequest.put("team", team);
+        playerRequest.put("number", number);
+        playerRequest.put("position", position);
     }
 
     @Given("an existing order with product {string} and quantity {int}")
@@ -43,25 +45,25 @@ public class OrderSteps {
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
 
-        this.orderId = ((Number) createResponse.getBody().get("id")).longValue();
+        this.playerId = ((Number) createResponse.getBody().get("id")).longValue();
     }
 
     // ---------- WHEN ----------
 
-    @When("the order is saved")
-    public void whenOrderIsSaved() {
+    @When("the player is saved")
+    public void whenPlayerIsSaved() {
         ResponseEntity<Map> createResponse =
-                restTemplate.postForEntity("/orders", orderRequest, Map.class);
+                restTemplate.postForEntity("/players", playerRequest, Map.class);
 
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(createResponse.getBody()).isNotNull();
 
-        this.orderId = ((Number) createResponse.getBody().get("id")).longValue();
+        this.playerId = ((Number) createResponse.getBody().get("id")).longValue();
     }
 
     @When("the order is deleted")
     public void whenOrderIsDeleted() {
-        restTemplate.delete("/orders/" + orderId);
+        restTemplate.delete("/orders/" + playerId);
     }
 
     @When("I request an order with id {int}")
@@ -87,21 +89,21 @@ public class OrderSteps {
 
     // ---------- THEN ----------
 
-    @Then("the order is persisted successfully")
-    public void thenOrderPersistedSuccessfully() {
+    @Then("the player is persisted successfully")
+    public void thenPlayerPersistedSuccessfully() {
         ResponseEntity<Map> getResponse =
-                restTemplate.getForEntity("/orders/" + orderId, Map.class);
+                restTemplate.getForEntity("/players/" + playerId, Map.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponse.getBody()).isNotNull();
         assertThat(((Number) getResponse.getBody().get("id")).longValue())
-                .isEqualTo(orderId);
+                .isEqualTo(playerId);
     }
 
     @Then("the order no longer exists")
     public void thenOrderNoLongerExists() {
         ResponseEntity<String> getResponse =
-                restTemplate.getForEntity("/orders/" + orderId, String.class);
+                restTemplate.getForEntity("/orders/" + playerId, String.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
